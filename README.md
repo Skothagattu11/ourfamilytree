@@ -7,7 +7,7 @@ npm install
 npm run dev        # web app  → http://localhost:5173
 npm run server     # voice relay → :8787 (Vite proxies /api to it). Needs `gcloud auth application-default login`
 npm run build && npm start   # production: one server for the app + voice on $PORT
-./deploy.sh        # Cloud Run (project entropy-lifestyle, us-central1)
+./deploy.sh        # first-time / manual deploy to Cloud Run (project entropy-lifestyle, us-central1)
 ```
 
 ## Voice assistant ("Vamsha")
@@ -27,3 +27,12 @@ npm run build && npm start   # production: one server for the app + voice on $PO
 - **Share as image:** `src/lib/shareImage.ts` (html-to-image → PNG, native share sheet on phones).
 - `.env.local` holds `VITE_SUPABASE_URL` / `VITE_SUPABASE_KEY` (publishable key).
 - `legacy.html` is the original single-file version.
+
+## Deploying
+- **Auto-deploy:** every push/merge to `main` runs the Cloud Build trigger
+  `rmgpgab-family-tree-us-central1-Skothagattu11-ourfamilytree-nhj` (global, GitHub app on Skothagattu11):
+  build `Dockerfile` → push to Artifact Registry `cloud-run-source-deploy` → `gcloud run services update family-tree`.
+  Service settings (service account `family-tree-run`, env vars, 3600 s timeout) are kept between deploys.
+- Work on a branch and merge a PR into `main` to release. Other branches don't deploy.
+- `./deploy.sh` is only needed to change service settings (env vars, scaling) or to recreate the service.
+- Live: https://family-tree-86140943446.us-central1.run.app — health check at `/health`.
