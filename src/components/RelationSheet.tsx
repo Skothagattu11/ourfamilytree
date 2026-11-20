@@ -84,7 +84,7 @@ export function RelationSheet() {
         <Button variant="primary" disabled={!path || path.length < 2} onClick={show}>{t('showOnTree')}</Button></div>}
     >
       <div className="px-5 pb-6 pt-3 sm:pt-6">
-        <div className="flex items-start gap-3">
+        <div className="flex items-start gap-3 pr-10">
           <Icon3D name="link" size={44} />
           <div>
             <h2 className="font-serif text-[24px] font-semibold leading-tight tracking-tight">{t('howRelatedQ')}</h2>

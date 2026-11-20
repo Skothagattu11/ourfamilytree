@@ -139,6 +139,7 @@ export function PersonSheet() {
       open={open}
       modal={false}
       onOpenChange={o => !o && set({ sel: null })}
+      closeLabel={t('close')}
       title={p ? fullName(p) : ''}
       footer={p && (
         <div className="flex gap-2">
@@ -158,7 +159,7 @@ export function PersonSheet() {
               </span>
             </button>
             <input ref={file} type="file" accept="image/*" hidden onChange={e => { pickPhoto(e.target.files?.[0]); e.target.value = ''; }} />
-            <div className="min-w-0 flex-1 pr-2">
+            <div className="min-w-0 flex-1 pr-10">
               <h2 className="font-serif text-[25px] font-semibold leading-tight tracking-tight">{p.placeholder ? t('unknown') : fullName(p)}</h2>
               <p className="mt-0.5 text-[14px] text-muted">
                 {[b ? t('born', { y: b }) : '', d ? t('died', { y: d }) : ''].filter(Boolean).join(' · ') || t('noDates')}

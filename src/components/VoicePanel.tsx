@@ -78,6 +78,8 @@ export function VoicePanel() {
     <Sheet
       open={open}
       modal={false}
+      closeOnOutside={false}
+      closeLabel={t('close')}
       onOpenChange={o => { if (!o) stopVoice(); }}
       title={t('voiceTitle')}
       footer={
@@ -94,7 +96,7 @@ export function VoicePanel() {
       }
     >
       <div className="px-5 pb-4 pt-3 sm:pt-6">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 pr-10">
           <Orb />
           <div className="min-w-0 flex-1">
             <h2 className="font-serif text-[21px] font-semibold leading-tight">{t('voiceTitle')}</h2>
