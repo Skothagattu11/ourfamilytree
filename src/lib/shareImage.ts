@@ -20,7 +20,7 @@ export async function renderTreeImage(nodes: Node[], title: string, subtitle: st
   const tree = await toCanvas(el, {
     backgroundColor: paper, width: w, height: h, pixelRatio: ratio, cacheBust: true,
     style: { width: `${w}px`, height: `${h}px`, transform: `translate(${pad - b.x}px, ${pad - b.y}px) scale(1)` },
-    filter: n => !(n instanceof HTMLElement && n.classList.contains('nodrag')),
+    filter: n => !(n instanceof Element && (n.classList.contains('nodrag') || n.classList.contains('no-export'))),
   });
 
   const head = 120 * ratio, foot = 54 * ratio;

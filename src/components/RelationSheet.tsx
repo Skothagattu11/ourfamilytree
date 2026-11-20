@@ -8,7 +8,7 @@ import { useT } from '../lib/i18n';
 import { RelationSentence, relationLabel } from './RelationText';
 import { Avatar, Button, Icon3D, Sheet, cn } from './ui';
 
-function Picker({ value, onChange, label }: { value?: string; onChange: (id: string) => void; label: string }) {
+export function Picker({ value, onChange, label }: { value?: string; onChange: (id: string) => void; label: string }) {
   const t = useT();
   const people = useData(s => s.people);
   const me = useData(s => s.me);

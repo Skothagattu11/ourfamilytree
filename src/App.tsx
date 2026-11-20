@@ -8,6 +8,7 @@ import { PersonForm } from './components/PersonForm';
 import { RelationSheet } from './components/RelationSheet';
 import { Search } from './components/Search';
 import { VoicePanel } from './components/VoicePanel';
+import { LinkSheet, UnlinkSheet } from './components/LinkSheet';
 import { Loading, Welcome } from './components/Welcome';
 import { BottomBar, Header, useShortcuts } from './components/Chrome';
 import { useIsMobile } from './components/ui';
@@ -64,6 +65,8 @@ export default function App() {
       <RelationSheet />
       <Search />
       <VoicePanel />
+      <LinkSheet />
+      <UnlinkSheet />
       {toaster}
     </div>
   );

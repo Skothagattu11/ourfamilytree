@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Camera, Link2, Pencil, Trash2, UserRound } from 'lucide-react';
+import { ArrowRight, Camera, Link2, Pencil, Spline, Trash2, UserRound } from 'lucide-react';
 import { toast } from 'sonner';
 import { useData, useUI, openForm, goTo, openFamilies } from '../store';
 import { fam, fullName, kidsOf, sibsOf, yr } from '../lib/family';
@@ -144,7 +144,8 @@ export function PersonSheet() {
       footer={p && (
         <div className="flex gap-2">
           <Button size="sm" className="flex-1" onClick={() => openForm({ mode: 'edit', of: p.id })}><Pencil size={15} /> {t('edit')}</Button>
-          <Button size="sm" className="flex-1" onClick={() => set({ rel: { a: p.id } })}><Link2 size={15} /> {t('relatedTo')}</Button>
+          <Button size="sm" className="flex-1" onClick={() => set({ linkReq: { a: p.id } })}><Spline size={15} /> {t('link')}</Button>
+          <Button size="sm" className="flex-1" onClick={() => set({ rel: { a: p.id } })}><Link2 size={15} /> {t('related')}</Button>
           <Button size="sm" variant="danger" onClick={del} aria-label={t('del')}><Trash2 size={15} /></Button>
         </div>
       )}

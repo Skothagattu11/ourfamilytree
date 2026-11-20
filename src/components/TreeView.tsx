@@ -3,7 +3,7 @@ import {
   ReactFlow, ReactFlowProvider, Handle, Position, useReactFlow, getViewportForBounds,
   type Edge, type Node, type NodeProps,
 } from '@xyflow/react';
-import { Minus, Plus, Maximize2, X, ChevronDown, Share2 } from 'lucide-react';
+import { Minus, Plus, Maximize2, X, ChevronDown, Share2, Link2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useData, useUI, openForm, goTo, useLineColor } from '../store';
 import type { Person } from '../types';
@@ -35,10 +35,16 @@ const PersonNode = memo(({ data }: NodeProps<PersonNodeT>) => {
       )}
       style={{ width: NW, height: NH }}
     >
-      <Handle type="target" position={Position.Top} id="t" />
-      <Handle type="source" position={Position.Bottom} id="b" />
-      <Handle type="source" position={Position.Right} id="r" />
-      <Handle type="target" position={Position.Left} id="l" />
+      {/* line anchors (not draggable) */}
+      <Handle type="target" position={Position.Top} id="t" isConnectable={false} />
+      <Handle type="source" position={Position.Bottom} id="b" isConnectable={false} />
+      <Handle type="source" position={Position.Right} id="r" isConnectable={false} />
+      <Handle type="target" position={Position.Left} id="l" isConnectable={false} />
+      {/* drag the dot onto another card to link two people */}
+      <Handle type="target" position={Position.Top} id="drop" className="drop-handle" isConnectableStart={false} />
+      <Handle type="source" position={Position.Bottom} id="link" className={cn('link-knob no-export', selected && 'show')} isConnectableEnd={false} title={t('linkHint')}>
+        <Link2 size={12} strokeWidth={2.6} />
+      </Handle>
       <Avatar p={p} size={44} className={p.died ? 'grayscale-[.6]' : ''} />
       <div className="min-w-0 flex-1">
         <div className="truncate text-[15px] font-semibold leading-tight">{p.placeholder ? t('unknown') : p.first || '?'}</div>
@@ -80,6 +86,7 @@ const CoupleNode = memo(({ data }: NodeProps<CoupleNodeT>) => (
 
 const nodeTypes = { person: PersonNode, couple: CoupleNode };
 type XY = { x: number; y: number };
+type UnlinkData = { kind: 'partner'; a: string; b: string } | { kind: 'parent'; child: string; parents: string[] };
 
 function Canvas() {
   const people = useData(s => s.people);
@@ -233,7 +240,7 @@ function Canvas() {
     const cls = (ok: boolean) => (lit ? (ok ? 'lit' : 'dim') : '');
     for (const [a, b] of L.couples) {
       const [l, r] = (pos[a] || L.pos[a]).x < (pos[b] || L.pos[b]).x ? [a, b] : [b, a];
-      out.push({ id: `s:${a}:${b}`, source: l, sourceHandle: 'r', target: r, targetHandle: 'l', type: 'straight', className: cls(!!lit?.has(a) && !!lit?.has(b)) });
+      out.push({ id: `s:${a}:${b}`, source: l, sourceHandle: 'r', target: r, targetHandle: 'l', type: 'straight', className: cls(!!lit?.has(a) && !!lit?.has(b)), data: { kind: 'partner', a, b } });
     }
     const coupleOf = new Set(L.couples.map(([a, b]) => `${a}:${b}`));
     for (const { c, ps } of L.kids) {
@@ -241,8 +248,8 @@ function Canvas() {
       const ok = !!lit?.has(c) && ps.some(p => lit.has(p));
       // a child's line is drawn in the colour of the family line they carry on
       const style = { stroke: colors[fam(people[c])] || 'var(--edge)' };
-      if (key && coupleOf.has(key)) out.push({ id: `k:${c}`, source: `c:${key}`, sourceHandle: 'b', target: c, targetHandle: 't', className: cls(ok), style });
-      else ps.forEach(p => out.push({ id: `k:${c}:${p}`, source: p, sourceHandle: 'b', target: c, targetHandle: 't', className: cls(ok), style }));
+      if (key && coupleOf.has(key)) out.push({ id: `k:${c}`, source: `c:${key}`, sourceHandle: 'b', target: c, targetHandle: 't', className: cls(ok), style, data: { kind: 'parent', child: c, parents: ps } });
+      else ps.forEach(p => out.push({ id: `k:${c}:${p}`, source: p, sourceHandle: 'b', target: c, targetHandle: 't', className: cls(ok), style, data: { kind: 'parent', child: c, parents: [p] } }));
     }
     return out;
   }, [L, pos, lit, people, colors]);
@@ -251,10 +258,16 @@ function Canvas() {
     <div ref={wrap} className="absolute inset-0">
       <ReactFlow
         nodes={nodes} edges={edges} nodeTypes={nodeTypes}
-        nodesDraggable={false} nodesConnectable={false} elementsSelectable={false}
+        nodesDraggable={false} elementsSelectable={false}
         minZoom={0.15} maxZoom={2.2} zoomOnDoubleClick={false}
         proOptions={{ hideAttribution: false }}
         attributionPosition="top-right"
+        nodesConnectable connectionRadius={48}
+        connectionLineStyle={{ stroke: 'var(--accent)', strokeWidth: 2.5, strokeDasharray: '6 5' }}
+        onConnectStart={() => { document.body.classList.add('ft-linking'); set({ hover: null }); }}
+        onConnectEnd={() => document.body.classList.remove('ft-linking')}
+        onConnect={c => { if (c.source && c.target && c.source !== c.target) set({ linkReq: { a: c.source, b: c.target } }); }}
+        onEdgeClick={(_, e) => { const d = e.data as UnlinkData | undefined; if (d) set({ unlinkReq: d }); }}
         onNodeClick={(_, n) => {
           if (n.type !== 'person') return;
           set({ sel: n.id, path: null });
