@@ -129,7 +129,8 @@ export function PersonSheet() {
     { mode: 'child', icon: 'child', label: t('child') },
     { mode: 'spouse', icon: 'partner', label: t('partner') },
     { mode: 'parent', icon: 'parent', label: t('parent'), hide: p.parents.length >= 2 },
-    { mode: 'sibling', icon: 'sibling', label: p.sex === 'f' ? t('sister') : p.sex === 'm' ? t('brother') : t('sibling') },
+    // the new person's gender isn't known yet — it's chosen in the form
+    { mode: 'sibling', icon: 'sibling', label: t('sibling') },
   ] : [];
   const b = p && (yr(p.born) || p.born), d = p && (yr(p.died) || p.died);
 

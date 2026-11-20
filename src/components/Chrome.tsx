@@ -4,7 +4,6 @@ import { startVoice, useVoice } from '../lib/voice/session';
 import { toast } from 'sonner';
 import { useData, useUI, openFamilies, openForm, goTo, inviteLink } from '../store';
 import { families } from '../lib/family';
-import { sampleData } from '../lib/sample';
 import { tr, useT } from '../lib/i18n';
 import type { TreeData } from '../types';
 import { LangSwitch } from './Welcome';
@@ -122,7 +121,6 @@ function MenuItems({ done }: { done: () => void }) {
       {item('home', t('restore'), t('restoreSub'), () => file.current?.click())}
       <input ref={file} type="file" accept=".json,application/json" hidden onChange={e => { importData(e.target.files?.[0]); e.target.value = ''; }} />
       <div className="my-1 border-t border-line" />
-      {item('people', t('loadExample'), t('replacesSub'), () => { useData.getState().replace(sampleData()); reset(); toast(tr('exampleLoaded')); done(); })}
       {item('seedling', armed ? t('blankArm') : t('blank'), armed ? t('blankArmSub') : t('blankSub'), () => {
         if (!armed) return setArmed(true);
         useData.getState().replace({ people: {}, collapsed: {} }); reset(); toast(tr('blankDone')); done();
