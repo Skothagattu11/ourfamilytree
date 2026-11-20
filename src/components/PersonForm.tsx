@@ -48,16 +48,26 @@ export function PersonForm() {
   const people = useData(s => s.people);
   const [v, setV] = useState(blank);
   const [flash, setFlash] = useState('');
+  const [askClose, setAskClose] = useState(false);
+  const initial = useRef(blank);
   const nameRef = useRef<HTMLInputElement>(null);
   const photoRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => { if (form) { setV(defaults(form)); setFlash(''); setTimeout(() => nameRef.current?.focus(), 350); } }, [form]);
+  useEffect(() => {
+    if (!form) return;
+    const d = defaults(form);
+    initial.current = d; setV(d); setFlash(''); setAskClose(false);
+    setTimeout(() => nameRef.current?.focus(), 350);
+  }, [form]);
 
   if (!form) return <Sheet open={false} onOpenChange={() => {}} title="Person">{null}</Sheet>;
   const o = form.of ? people[form.of] : undefined;
   const tt = tT;
   const multi = ['child', 'sibling', 'new'].includes(form.mode) && !form.first;
   const close = () => set({ form: null });
+  const dirty = JSON.stringify(v) !== JSON.stringify(initial.current);
+  /** ✕, Cancel, Esc, clicking outside, swiping down — all come through here. */
+  const requestClose = () => (dirty ? setAskClose(true) : close());
 
   const titles: Record<string, [string, string]> = {
     new: form.first ? [tt('whoFirst'), tt('whoFirstSub')] : [tt('addAPerson'), ''],
@@ -93,7 +103,9 @@ export function PersonForm() {
       useUI.getState().set({ focus: { id: made[0], tick: Date.now() } });
     }
     if (more) {
-      setV(x => ({ ...x, first: '', born: '', died: '', notes: '', photo: '' }));
+      const next = { ...v, first: '', born: '', died: '', notes: '', photo: '' };
+      initial.current = next;
+      setV(next);
       setFlash(tr('addedKeepGoing', { n: names }));
       nameRef.current?.focus();
     } else {
@@ -108,19 +120,28 @@ export function PersonForm() {
   return (
     <Sheet
       open={!!form}
-      onOpenChange={o => !o && close()}
+      onOpenChange={o => !o && requestClose()}
       title={title}
-      footer={
+      closeLabel={tt('close')}
+      footer={askClose ? (
+        <div className="flex flex-wrap items-center gap-2" role="alertdialog" aria-label={tt('unsavedQ')}>
+          <span className="w-full text-[14.5px] font-semibold">{tt('unsavedQ')}</span>
+          <Button variant="ghost" onClick={() => setAskClose(false)}>{tt('keepEditing')}</Button>
+          <div className="flex-1" />
+          <Button variant="danger" onClick={close}>{tt('discard')}</Button>
+          <Button variant="primary" onClick={() => save(false)}>{tt('save')}</Button>
+        </div>
+      ) : (
         <div className="flex gap-2">
-          <Button variant="ghost" onClick={close}>{tt('cancel')}</Button>
+          <Button variant="ghost" onClick={requestClose}>{tt('cancel')}</Button>
           <div className="flex-1" />
           {multi && <Button onClick={() => save(true)}>{tt('saveMore')}</Button>}
           <Button variant="primary" onClick={() => save(false)}>{tt('save')}</Button>
         </div>
-      }
+      )}
     >
       <form className="px-5 pb-6 pt-3 sm:pt-6" onSubmit={e => { e.preventDefault(); save(false); }}>
-        <div className="flex items-start gap-3">
+        <div className="flex items-start gap-3 pr-10">
           <Icon3D name={icon} size={44} />
           <div className="min-w-0 flex-1">
             <h2 className="font-serif text-[24px] font-semibold leading-tight tracking-tight">{title}</h2>

@@ -96,7 +96,7 @@ function MenuItems({ done }: { done: () => void }) {
 
   return (
     <div className="p-2">
-      <div className="flex items-center justify-between gap-3 px-3 pb-2 pt-1">
+      <div className="flex items-center justify-between gap-3 px-3 pb-2 pt-1 max-sm:pr-12">
         <div className="min-w-0">
           <div className="truncate font-serif text-[18px] font-semibold">{treeName}</div>
         </div>
