@@ -1,0 +1,9 @@
+{
+  "name": "Family Tree",
+  "short_name": "Family Tree",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f6f3ee",
+  "theme_color": "#f6f3ee",
+  "icons": [{ "src": "icons/tree.png", "sizes": "256x256", "type": "image/png" }]
+}

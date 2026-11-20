@@ -1,0 +1,94 @@
+@import "tailwindcss";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/fraunces";
+@import "@fontsource-variable/noto-sans-telugu";
+@import "@xyflow/react/dist/base.css";
+
+@theme inline {
+  --font-sans: "Inter Variable", "Noto Sans Telugu Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Fraunces Variable", "Noto Sans Telugu Variable", Georgia, serif;
+  --color-paper: var(--paper);
+  --color-card: var(--card);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-soft: var(--soft);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-danger: var(--danger);
+}
+
+:root {
+  --paper: #f6f3ee; --card: #ffffff; --ink: #1d1a16; --muted: #6d655c; --line: #e6e0d6;
+  --soft: #efe9e0; --accent: #2f5d50; --accent-ink: #ffffff; --accent-soft: #dfeae5;
+  --edge: #bdb4a8; --danger: #b4412f;
+  --shadow-card: 0 1px 2px rgb(40 30 20 / .05), 0 6px 18px -8px rgb(40 30 20 / .18);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #151412; --card: #1f1d1a; --ink: #f1ece5; --muted: #a39a8f; --line: #34302b;
+    --soft: #29261f; --accent: #8fc3b1; --accent-ink: #10201b; --accent-soft: #223029;
+    --edge: #5c564d; --danger: #e47a68;
+    --shadow-card: 0 1px 2px rgb(0 0 0 / .3), 0 8px 20px -10px rgb(0 0 0 / .6);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #151412; --card: #1f1d1a; --ink: #f1ece5; --muted: #a39a8f; --line: #34302b;
+  --soft: #29261f; --accent: #8fc3b1; --accent-ink: #10201b; --accent-soft: #223029;
+  --edge: #5c564d; --danger: #e47a68;
+  --shadow-card: 0 1px 2px rgb(0 0 0 / .3), 0 8px 20px -10px rgb(0 0 0 / .6);
+  color-scheme: dark;
+}
+
+html, body, #root { height: 100%; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--font-sans); font-size: 15px; line-height: 1.45;
+  -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+button { cursor: pointer; touch-action: manipulation; }
+input, select, textarea { font-size: 16px; } /* no iOS focus zoom */
+
+.shadow-card { box-shadow: var(--shadow-card); }
+.pb-safe { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+.pt-safe { padding-top: max(10px, env(safe-area-inset-top)); }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
+
+/* ---------- tree canvas ---------- */
+.react-flow { --xy-background-color: transparent; }
+.react-flow__pane { cursor: grab; }
+.react-flow__pane.dragging { cursor: grabbing; }
+.react-flow__node { cursor: pointer; }
+.react-flow__handle { opacity: 0; pointer-events: none; min-width: 1px; min-height: 1px; width: 1px; height: 1px; border: 0; }
+.react-flow__edge-path { stroke: var(--edge); stroke-width: 2; fill: none; opacity: .75; transition: opacity .2s, stroke-width .2s; }
+.react-flow__edge.dim .react-flow__edge-path { opacity: .12; }
+.react-flow__edge.lit .react-flow__edge-path { stroke-width: 3; opacity: 1; }
+.react-flow__attribution { background: transparent; font-size: 10px; opacity: .5; }
+
+/* ---------- inputs ---------- */
+.field {
+  width: 100%; border-radius: 14px; border: 1px solid var(--line); background: var(--paper);
+  padding: 12px 14px; color: var(--ink); outline: none; transition: border-color .15s, box-shadow .15s;
+}
+.field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.field::placeholder { color: color-mix(in srgb, var(--muted) 70%, transparent); }
+
+/* ---------- cmdk search ---------- */
+[cmdk-overlay] { position: fixed; inset: 0; z-index: 60; background: rgb(20 15 10 / .3); backdrop-filter: blur(2px); }
+[cmdk-dialog] {
+  position: fixed; z-index: 61; left: 50%; top: 12vh; transform: translateX(-50%);
+  width: min(560px, calc(100vw - 24px)); background: var(--card); border: 1px solid var(--line);
+  border-radius: 22px; box-shadow: 0 24px 60px -20px rgb(0 0 0 / .4); overflow: hidden;
+}
+@media (max-width: 720px) { [cmdk-dialog] { top: max(10px, env(safe-area-inset-top)); } }
+[cmdk-input] { width: 100%; border: 0; outline: none; background: transparent; padding: 18px 18px 14px; color: var(--ink); }
+[cmdk-list] { max-height: min(420px, 60dvh); overflow: auto; padding: 6px; border-top: 1px solid var(--line); }
+[cmdk-item] { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 14px; cursor: pointer; }
+[cmdk-item][data-selected="true"] { background: var(--soft); }
+[cmdk-group-heading] { padding: 8px 12px 4px; font-size: 12px; color: var(--muted); font-weight: 600; }
+[cmdk-empty] { padding: 18px; color: var(--muted); text-align: center; }

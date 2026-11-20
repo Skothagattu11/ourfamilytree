@@ -1,0 +1,133 @@
+[
+  {
+    "name": "get_overview",
+    "description": "Summary of the open family tree: its name, the family lines (family names) with member counts, total people, and who the user is if known. Call this at the start of a conversation and whenever you need the big picture.",
+    "parameters": { "type": "OBJECT", "properties": {} }
+  },
+  {
+    "name": "find_people",
+    "description": "Search people already in the tree by name (first name, family name or both; partial or approximate spellings are fine). Returns person ids to use with the other tools. Always search before assuming someone does or doesn't exist.",
+    "parameters": {
+      "type": "OBJECT",
+      "properties": { "query": { "type": "STRING", "description": "A name as the user said it, e.g. 'Ravi' or 'Lakshmi Rao'." } },
+      "required": ["query"]
+    }
+  },
+  {
+    "name": "get_person",
+    "description": "Full details of one person plus their parents, partners, children and siblings (with ids).",
+    "parameters": {
+      "type": "OBJECT",
+      "properties": { "person_id": { "type": "STRING" } },
+      "required": ["person_id"]
+    }
+  },
+  {
+    "name": "how_related",
+    "description": "How person A is related to person B: the English term, the Telugu kinship word (with romanised reading) and the chain of people linking them. For 'how is X related to me', use the user's own person id as person_b_id.",
+    "parameters": {
+      "type": "OBJECT",
+      "properties": {
+        "person_a_id": { "type": "STRING" },
+        "person_b_id": { "type": "STRING" }
+      },
+      "required": ["person_a_id", "person_b_id"]
+    }
+  },
+  {
+    "name": "propose_add_person",
+    "description": "Prepare adding a NEW person (does not save). Optionally link them to an existing relative. Returns a proposal_id, a one-sentence summary to read back, and missing_details still worth asking for. The proposal appears on the user's screen. Nothing is saved until confirm_proposal. Creating a new proposal replaces any unconfirmed one.",
+    "parameters": {
+      "type": "OBJECT",
+      "properties": {
+        "first_name": { "type": "STRING" },
+        "family_name": { "type": "STRING", "description": "Surname / family name (the family line they appear in). Leave empty to use the relative's family name for child, parent or sibling." },
+        "gender": { "type": "STRING", "enum": ["female", "male", "unknown"] },
+        "born_year": { "type": "INTEGER", "description": "Approximate is fine." },
+        "died_year": { "type": "INTEGER", "description": "Only if they have passed away." },
+        "notes": { "type": "STRING", "description": "Anything else worth remembering: town, profession, nickname." },
+        "relation": { "type": "STRING", "enum": ["none", "child", "partner", "parent", "sibling"], "description": "What the NEW person is to relative_id. 'child' means the new person is a child of relative_id. Use 'none' only for the very first person or someone unconnected." },
+        "relative_id": { "type": "STRING", "description": "Existing person the new person is related to." },
+        "other_parent_id": { "type": "STRING", "description": "For relation=child: the relative's partner who is the other parent." }
+      },
+      "required": ["first_name"]
+    }
+  },
+  {
+    "name": "propose_update_person",
+    "description": "Prepare changing details of someone already in the tree (does not save). Only pass the fields that change.",
+    "parameters": {
+      "type": "OBJECT",
+      "properties": {
+        "person_id": { "type": "STRING" },
+        "first_name": { "type": "STRING" },
+        "family_name": { "type": "STRING" },
+        "gender": { "type": "STRING", "enum": ["female", "male", "unknown"] },
+        "born_year": { "type": "INTEGER" },
+        "died_year": { "type": "INTEGER", "description": "Use 0 to mark them as living again." },
+        "notes": { "type": "STRING" }
+      },
+      "required": ["person_id"]
+    }
+  },
+  {
+    "name": "propose_link",
+    "description": "Prepare connecting two people who are BOTH already in the tree (does not save), e.g. 'Ravi and Sita are married' or 'Anu is Ravi's daughter'.",
+    "parameters": {
+      "type": "OBJECT",
+      "properties": {
+        "person_id": { "type": "STRING" },
+        "relation": { "type": "STRING", "enum": ["child", "partner", "parent"], "description": "What person_id is to relative_id." },
+        "relative_id": { "type": "STRING" }
+      },
+      "required": ["person_id", "relation", "relative_id"]
+    }
+  },
+  {
+    "name": "propose_remove_person",
+    "description": "Prepare removing someone from the tree (does not save). Always ask the user to confirm twice before confirming a removal.",
+    "parameters": {
+      "type": "OBJECT",
+      "properties": { "person_id": { "type": "STRING" } },
+      "required": ["person_id"]
+    }
+  },
+  {
+    "name": "confirm_proposal",
+    "description": "Save a proposal. Only call after the user clearly said yes to the summary you read back.",
+    "parameters": {
+      "type": "OBJECT",
+      "properties": { "proposal_id": { "type": "STRING" } },
+      "required": ["proposal_id"]
+    }
+  },
+  {
+    "name": "cancel_proposal",
+    "description": "Discard a proposal the user said no to.",
+    "parameters": {
+      "type": "OBJECT",
+      "properties": { "proposal_id": { "type": "STRING" } },
+      "required": ["proposal_id"]
+    }
+  },
+  {
+    "name": "set_me",
+    "description": "Remember which person in the tree is the user (e.g. after 'I am Anil'). Needed to answer questions about 'me'.",
+    "parameters": {
+      "type": "OBJECT",
+      "properties": { "person_id": { "type": "STRING" } },
+      "required": ["person_id"]
+    }
+  },
+  {
+    "name": "show_on_screen",
+    "description": "Move the visible tree to a person or a family line so the user can see who you mean.",
+    "parameters": {
+      "type": "OBJECT",
+      "properties": {
+        "person_id": { "type": "STRING" },
+        "family_name": { "type": "STRING" }
+      }
+    }
+  }
+]
