@@ -64,7 +64,29 @@ input, select, textarea { font-size: 16px; } /* no iOS focus zoom */
 .react-flow__pane { cursor: grab; }
 .react-flow__pane.dragging { cursor: grabbing; }
 .react-flow__node { cursor: pointer; }
+.react-flow__node:focus { outline: none; }
+.react-flow__node:focus-visible > div { box-shadow: 0 0 0 3px var(--accent-soft), 0 0 0 4px var(--accent); }
 .react-flow__handle { opacity: 0; pointer-events: none; min-width: 1px; min-height: 1px; width: 1px; height: 1px; border: 0; }
+/* link dot: drag onto another card to connect two people */
+.react-flow__handle.link-knob {
+  opacity: 0; pointer-events: all; cursor: crosshair; z-index: 5;
+  width: 24px; height: 24px; min-width: 24px; min-height: 24px;
+  left: auto; right: 12px; top: auto; bottom: -12px; transform: none;   /* bottom-right corner, clear of every line */
+  display: grid; place-items: center; border-radius: 999px;
+  background: var(--accent); color: var(--accent-ink); border: 2px solid var(--card);
+  box-shadow: 0 2px 6px rgb(0 0 0 / .18); transition: opacity .15s, transform .15s;
+}
+.react-flow__handle.link-knob svg { pointer-events: none; }
+.react-flow__node:hover .link-knob, .link-knob.show, .ft-linking .link-knob.connectingfrom { opacity: 1; }
+.react-flow__handle.link-knob:hover { transform: scale(1.12); }
+@media (hover: none) { .react-flow__handle.link-knob { width: 30px; height: 30px; min-width: 30px; min-height: 30px; bottom: -15px; } }
+/* while linking, the whole card is a drop target */
+.react-flow__handle.drop-handle { inset: 0; width: 100%; height: 100%; transform: none; border-radius: 20px; z-index: 1; }
+.ft-linking .react-flow__handle.drop-handle { pointer-events: all; }
+.ft-linking .react-flow__handle.drop-handle.connectingto { opacity: 1; background: transparent; box-shadow: 0 0 0 3px var(--accent); }
+.react-flow__edge { cursor: pointer; }
+.react-flow__edge:hover .react-flow__edge-path { stroke-width: 3.5; opacity: 1; }
+.react-flow__connection-path { fill: none; }
 .react-flow__edge-path { stroke: var(--edge); stroke-width: 2; fill: none; opacity: .75; transition: opacity .2s, stroke-width .2s; }
 .react-flow__edge.dim .react-flow__edge-path { opacity: .12; }
 .react-flow__edge.lit .react-flow__edge-path { stroke-width: 3; opacity: 1; }

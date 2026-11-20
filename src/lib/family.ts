@@ -93,3 +93,16 @@ export const uid = () => {
   const h = [...b].map(x => x.toString(16).padStart(2, '0')).join('');
   return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
 };
+
+export type LinkRel = 'parent' | 'child' | 'partner';
+/** Why `personId` can't be the <rel> of `relativeId` — or null if the link is fine. */
+export function linkProblem(people: People, personId: string, rel: LinkRel, relativeId: string): 'same' | 'exists' | 'twoParents' | 'ancestor' | null {
+  const p = people[personId], r = people[relativeId];
+  if (!p || !r || p.id === r.id) return 'same';
+  if (rel === 'partner') return p.spouses.includes(r.id) ? 'exists' : null;
+  const child = rel === 'child' ? p : r, parent = rel === 'child' ? r : p;
+  if (child.parents.includes(parent.id)) return 'exists';
+  if (child.parents.filter(x => people[x]).length >= 2) return 'twoParents';
+  if (ancestorsOf(people, parent.id).has(child.id) || child.id === parent.id) return 'ancestor';
+  return null;
+}

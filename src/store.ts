@@ -35,6 +35,8 @@ interface DataStore extends TreeData {
   replace: (d: TreeData) => void;
   /** Connect two existing people: person is the child / partner / parent of relative. */
   link: (personId: string, relation: 'child' | 'partner' | 'parent', relativeId: string) => void;
+  /** Remove one link. Returns a snapshot for Undo. */
+  unlink: (personId: string, relation: 'child' | 'partner' | 'parent', relativeId: string) => TreeData;
 }
 
 const clone = <T,>(x: T): T => JSON.parse(JSON.stringify(x));
@@ -237,6 +239,23 @@ export const useData = create<DataStore>()(
         setS({ people });
       },
 
+      unlink: (personId, relation, relativeId) => {
+        const snap: TreeData = clone({ people: getS().people, collapsed: getS().collapsed, me: getS().me });
+        const people = clone(getS().people);
+        const p = people[personId], r = people[relativeId];
+        if (p && r) {
+          if (relation === 'partner') {
+            p.spouses = p.spouses.filter(x => x !== r.id);
+            r.spouses = r.spouses.filter(x => x !== p.id);
+          } else {
+            const child = relation === 'child' ? p : r, parent = relation === 'child' ? r : p;
+            child.parents = child.parents.filter(x => x !== parent.id);
+          }
+          setS({ people });
+        }
+        return snap;
+      },
+
       replace: d => {
         const r = remapIds(d);
         setS({ people: r.people, collapsed: {}, colors: r.colors || {}, me: r.me ?? null });
@@ -302,11 +321,15 @@ interface UIStore {
   form: FormState | null;
   searchOpen: boolean;
   rel: { a?: string; b?: string } | null;
+  /** Linking two people (b missing → pick from a list). */
+  linkReq: { a: string; b?: string } | null;
+  /** Removing a line on the tree. */
+  unlinkReq: { kind: 'partner'; a: string; b: string } | { kind: 'parent'; child: string; parents: string[] } | null;
   set: (p: Partial<UIStore>) => void;
 }
 export const useUI = create<UIStore>()(setS => ({
   view: 'families', fams: [], sel: null, hover: null, path: null, pathLabel: '',
-  fitTick: 0, shareTick: 0, focus: null, form: null, searchOpen: false, rel: null,
+  fitTick: 0, shareTick: 0, focus: null, form: null, searchOpen: false, rel: null, linkReq: null, unlinkReq: null,
   set: p => setS(p),
 }));
 
