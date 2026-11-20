@@ -40,7 +40,7 @@ interface DataStore extends TreeData {
 const clone = <T,>(x: T): T => JSON.parse(JSON.stringify(x));
 const isUuid = (s: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
 
-/** Imported/sample data may use short ids — the database wants UUIDs. */
+/** Imported backups may use short ids — the database wants UUIDs. */
 function remapIds(d: TreeData): TreeData {
   const map: Record<string, string> = {};
   for (const id of Object.keys(d.people || {})) map[id] = isUuid(id) ? id : uid();

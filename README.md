@@ -26,7 +26,6 @@ npm run build && npm start   # production: one server for the app + voice on $PO
 - **Telugu:** UI strings in `src/lib/i18n.ts`; kinship terms (అన్నయ్య, బాబాయి, మరదలు…) in `src/lib/telugu.ts`.
 - **Share as image:** `src/lib/shareImage.ts` (html-to-image → PNG, native share sheet on phones).
 - `.env.local` holds `VITE_SUPABASE_URL` / `VITE_SUPABASE_KEY` (publishable key).
-- `legacy.html` is the original single-file version.
 
 ## Deploying
 - **Auto-deploy:** every push/merge to `main` runs the Cloud Build trigger

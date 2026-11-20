@@ -1,35 +1,14 @@
-import { useEffect, useState } from 'react';
 import { ArrowRight, Plus } from 'lucide-react';
-import { get } from 'idb-keyval';
-import { toast } from 'sonner';
 import { useData, useUI, openFamilies, openForm, useLineColor } from '../store';
 import { families, linkedFamilies, yr } from '../lib/family';
 import { layout } from '../lib/layout';
-import { sampleData } from '../lib/sample';
 import { useT } from '../lib/i18n';
-import type { TreeData } from '../types';
 import { Avatar, Button, Icon3D } from './ui';
-
-/** The tree this device kept locally before the database existed (if any). */
-function useLegacyTree() {
-  const [legacy, setLegacy] = useState<TreeData | null>(null);
-  useEffect(() => {
-    get<string>('family-tree').then(raw => {
-      if (!raw) return;
-      try {
-        const st = JSON.parse(raw).state as TreeData;
-        if (st?.people && Object.keys(st.people).length) setLegacy(st);
-      } catch { /* ignore */ }
-    }).catch(() => {});
-  }, []);
-  return legacy;
-}
 
 export function FamiliesView() {
   const t = useT();
   const people = useData(s => s.people);
   const color = useLineColor();
-  const legacy = useLegacyTree();
   const fm = families(people);
   const names = Object.keys(fm).sort((a, b) => fm[b].length - fm[a].length || a.localeCompare(b));
 
@@ -41,12 +20,6 @@ export function FamiliesView() {
         <p className="mt-3 text-muted">{t('startBody')}</p>
         <div className="mt-8 flex w-full flex-col gap-3">
           <Button variant="primary" size="lg" onClick={() => openForm({ mode: 'new', first: true })}>{t('addYourself')}</Button>
-          {legacy && (
-            <Button size="lg" onClick={() => { useData.getState().replace(legacy); toast.success(t('loadedN', { n: Object.keys(legacy.people).length })); }}>
-              <Icon3D name="home" size={22} /> {t('bringOver')}
-            </Button>
-          )}
-          <Button size="lg" variant="ghost" onClick={() => { useData.getState().replace(sampleData()); toast(t('exampleLoaded')); }}>{t('seeExample')}</Button>
         </div>
       </div>
     );
